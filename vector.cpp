@@ -9,11 +9,15 @@ vector::vector(const vector& str) {
 	first_free = cap = data.second;
 }
 
+vector::vector(vector&& str) noexcept : elements(str.elements) , first_free(str.first_free), cap(str.cap) {
+	str.elements = str.first_free = str.cap = nullptr;
+}
+
 vector::~vector() {
 	free();
 }
 
-vector& vector::operator= (const vector& str) {
+vector& vector::operator= (const vector& str) & {
 	auto data = alloc_n_copy(str.begin(), str.end());
 	free();
 	elements = data.first;
@@ -21,9 +25,25 @@ vector& vector::operator= (const vector& str) {
 	return *this;
 }
 
+vector& vector::operator= (vector&& str) noexcept {
+	if (this != &str) {
+		free();
+		elements = str.elements;
+		first_free = str.first_free;
+		cap = str.cap;
+		str.elements = str.first_free = str.cap = nullptr;
+	}
+	return *this;
+}
+
 void vector::push_back(const std::string& str) {
 	chk_n_alloc();
 	alloc.construct(first_free++, str);
+}
+
+void vector::push_back(std::string&& str) {
+	chk_n_alloc();
+	alloc.construct(first_free++, std::move(str));
 }
 
 std::pair<std::string*, std::string*> vector::alloc_n_copy(const std::string* begin, const std::string* end) {
@@ -43,6 +63,15 @@ void vector::free() {
 
 void vector::reallocate() {
 	auto capacity = size() ? 2 * size() : 1;
+	auto first = alloc.allocate(capacity);
+	auto last = std::uninitialized_copy(std::make_move_iterator(begin()), std::make_move_iterator(end()), first);
+	elements = first;
+	first_free = last;
+	cap = elements + capacity;
+}
+
+/*void vector::reallocate() {
+	auto capacity = size() ? 2 * size() : 1;
 	auto data = alloc.allocate(capacity);
 	auto databak = data;
 	auto elembak = elements;
@@ -54,4 +83,4 @@ void vector::reallocate() {
 	elements = data;
 	first_free = databak;
 	cap = elements + capacity;
-}
+}*/

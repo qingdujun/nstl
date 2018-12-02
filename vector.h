@@ -9,9 +9,12 @@ namespace nstl {
 		vector() : elements(nullptr), first_free(nullptr), cap(nullptr) {
 		}
 		vector(const vector&);
-		vector& operator= (const vector&);
+		vector(vector&&) noexcept;
+		vector& operator= (const vector&) &;
+		vector& operator= (vector&&) noexcept;
 		~vector();
 		void push_back(const std::string&);
+		void push_back(std::string&&);
 		size_t size() const {
 			return first_free - elements;
 		}
