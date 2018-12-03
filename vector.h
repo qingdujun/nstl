@@ -12,6 +12,13 @@ namespace nstl {
 		vector(vector&&) noexcept;
 		vector& operator= (const vector&) &;
 		vector& operator= (vector&&) noexcept;
+		vector& operator= (std::initializer_list<std::string>);
+		std::string& operator[] (std::size_t n) {
+			return elements[n];
+		}
+		const std::string& operator[] (std::size_t n) const {
+			return elements[n];
+		}
 		~vector();
 		void push_back(const std::string&);
 		void push_back(std::string&&);

@@ -36,6 +36,14 @@ vector& vector::operator= (vector&& str) noexcept {
 	return *this;
 }
 
+vector& vector::operator= (std::initializer_list<std::string> il) {
+	auto data = alloc_n_copy(il.begin(), il.end());
+	free();
+	elements = data.first;
+	first_free = cap = data.second;
+	return *this;
+}
+
 void vector::push_back(const std::string& str) {
 	chk_n_alloc();
 	alloc.construct(first_free++, str);
